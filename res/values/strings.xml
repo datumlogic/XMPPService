@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">LocalBoundConnectionDemo</string>
+    <string name="action_settings">Settings</string>
+    <string name="textMain"></string>
+    <string name="btnText">Check Connection</string>
+
+</resources>
