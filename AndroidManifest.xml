@@ -21,11 +21,15 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".ConnectionService" />
+        <activity
+            android:name="com.fezzee.activity.ChatHistoryActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+        </activity>
+        <service android:name="com.fezzee.service.XMPPService" />
     </application>
 
 </manifest>
