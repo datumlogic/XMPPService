@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.fezzee.patterns.Observable;
 import com.fezzee.patterns.Observer;
+import com.fezzee.service.XMPPService;
 import com.fezzee.service.connection.R;
 
 
@@ -22,7 +24,7 @@ public class ChatFragment extends Fragment implements Observer {
     public static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "ChatFragment";
     
-   // private ConnectionService myService;    
+    private XMPPService myService;    
 	//private boolean isBound = false;
 
     @Override
@@ -72,6 +74,22 @@ public class ChatFragment extends Fragment implements Observer {
         
         return rootView;
     }
+    
+    /*
+	 * adds clarity to the process?
+	 * Replaced 
+	 * 		myService = binder.getService();
+	 * with
+	 * 		setObservable(binder.getService());
+	 * in 
+	 * 		ServiceConnection::onServiceConnected
+	 */
+	@Override
+	public void setObservable(Observable obj)
+	{
+		this.myService = (XMPPService)obj;
+	}
+	
     
 	//can be called from any thread
 	@Override

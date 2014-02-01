@@ -9,7 +9,7 @@ import org.jivesoftware.smack.packet.Message;
 import android.util.Log;
 
 
-public class ChatObserver implements ChatManagerListener {
+public class XMPPChatListener implements ChatManagerListener {
 	
 	
 	private final String TAG = "ChatObserver";

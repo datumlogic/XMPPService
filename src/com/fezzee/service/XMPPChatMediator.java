@@ -13,14 +13,14 @@ import android.util.Log;
 //import java.util.List;
 
 
-public class ChatMediator {
+public class XMPPChatMediator {
 	
 	private ChatManager manager;
 	private final String TAG = "ChatMediator";
 	private ArrayList<ChatManager> activeChats;
 	private XMPPService service;
 
-	public ChatMediator(ChatManager chatManager, XMPPService service){
+	public XMPPChatMediator(ChatManager chatManager, XMPPService service){
 		this.activeChats = new ArrayList<ChatManager>();
 		this.manager = chatManager;
 		this.service = service;
@@ -39,7 +39,7 @@ public class ChatMediator {
 		@Override
 		public void processMessage(final Chat chat, final Message message) {
 			Log.e(TAG, "Xmpp message received: '" + message.getBody() + "' on thread: " + getThreadSignature());
-			service.postMessage("Xmpp message received: '" + message.getBody() + "' on thread: " + getThreadSignature(),XMPPTypes.CHAT);
+			service.setState("Xmpp message received: '" + message.getBody() + "' on thread: " + getThreadSignature(),XMPPTypes.CHAT);
 			// --> this is another thread ('Smack Listener Processor') not the
 			// main thread!
 			// you can parse the content of the message here

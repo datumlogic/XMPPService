@@ -88,11 +88,13 @@ public class LocalBoundActivity extends Activity implements Observer{
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    // Handle item selection
 	    switch (item.getItemId()) {
+	   
 	    	case R.id.action_chat:
 	    		Intent i = new Intent(getBaseContext(), ChatHistoryActivity.class);
 	    		i.putExtra("JID", "gene");
 	    		startActivity(i);
 	    		return true;
+	    
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -108,7 +110,7 @@ public class LocalBoundActivity extends Activity implements Observer{
 				   
 				setObservable(binder.getService());
 				myService.register(LocalBoundActivity.this, XMPPTypes.CONNECTION);
-				myService.postMessage("Service Started",XMPPTypes.CONNECTION);
+				myService.setState("Service Started",XMPPTypes.CONNECTION);
 				isBound = true;    
 			}        
 		
@@ -140,7 +142,7 @@ public class LocalBoundActivity extends Activity implements Observer{
 	public void update() {
 		this.runOnUiThread(new Runnable() {
 		    public void run() {
-		    	String serviceVal = (String) myService.getUpdate(LocalBoundActivity.this,XMPPTypes.CONNECTION);
+		    	String serviceVal = (String) myService.getState(LocalBoundActivity.this,XMPPTypes.CONNECTION);
 				final TextView myTextView = (TextView)findViewById(R.id.myTextView);  
 				myTextView.append(serviceVal+"\n");//
 				if (myTextView.getLineCount()>0)

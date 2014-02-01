@@ -53,7 +53,7 @@ public class XMPPService extends Service implements Observable {
 	private SmackAndroid asmk;
 	
 	//private ConnectionObserver connObserver;
-	private ChatMediator chatMediator;
+	private XMPPChatMediator chatMediator;
 	
 	private final Object MUTEX= new Object();
 	
@@ -128,7 +128,7 @@ public class XMPPService extends Service implements Observable {
 		connConfig.setReconnectionAllowed(true);
 		
 		connection = new XMPPConnection(connConfig);
-		connection.addConnectionListener(new ConnectionObserver(this));
+		connection.addConnectionListener(new XMPPConnectionListener(this));
 		
 	}
 	
@@ -197,7 +197,7 @@ public class XMPPService extends Service implements Observable {
 	    		
 	    		if (connection == null){
 	    			Log.e(TAG, "Connection is NULL");
-	    			postMessage("Connection is NULL",XMPPTypes.CONNECTION);
+	    			setState("Connection is NULL",XMPPTypes.CONNECTION);
 	    			return;
 	    		}
 	    		
@@ -211,16 +211,16 @@ public class XMPPService extends Service implements Observable {
 	            
 	    			if (connection.isConnected()) 
 	    				//Log.d(TAG,  "Connected to " + connection.getHost());
-	    			    postMessage("Connected to " + connection.getHost(),XMPPTypes.CONNECTION);
+	    			    setState("Connected to " + connection.getHost(),XMPPTypes.CONNECTION);
 	    			else {
-	    				postMessage("Not Connected",XMPPTypes.CONNECTION);
+	    				setState("Not Connected",XMPPTypes.CONNECTION);
 	    				return;
 	    			}
 	    			
 	    			if (connection.isAuthenticated()) 
-	    				postMessage("Authenticted as " + connection.getUser(),XMPPTypes.CONNECTION);
+	    				setState("Authenticted as " + connection.getUser(),XMPPTypes.CONNECTION);
 	    			else {
-	    				postMessage("Not Authenticated",XMPPTypes.CONNECTION);
+	    				setState("Not Authenticated",XMPPTypes.CONNECTION);
 	    				return;
 	    			}
 	            
@@ -230,8 +230,8 @@ public class XMPPService extends Service implements Observable {
 	    			
 	    			
 	    			ChatManager chatman = connection.getChatManager();
-	    			chatMediator = new ChatMediator(chatman, XMPPService.this);
-	    			chatman.addChatListener(new ChatObserver());
+	    			chatMediator = new XMPPChatMediator(chatman, XMPPService.this);
+	    			chatman.addChatListener(new XMPPChatListener());
 	    			
 	    			//connection.getChatManager().addChatListener(new ChatObserver());
 	    			
@@ -251,14 +251,14 @@ public class XMPPService extends Service implements Observable {
 	    		} catch (XMPPException ex) {
 	                Log.e(TAG, "Failed to log in as "+  USERNAME);
 	                Log.e(TAG, ex.toString());
-	                postMessage("Exception Ln 242: " + ex.toString(),XMPPTypes.CONNECTION);
+	                setState("Exception Ln 242: " + ex.toString(),XMPPTypes.CONNECTION);
 	                //connection = null;
 	                return;
 	    		} catch (Exception e) {
 	              //all other exceptions
 	        	   Log.e(TAG, "Unhandled Exception"+  e.getMessage()); 
 	        	   e.printStackTrace();
-	        	   postMessage("Exception Ln 249: " + e.toString(),XMPPTypes.CONNECTION);
+	        	   setState("Exception Ln 249: " + e.toString(),XMPPTypes.CONNECTION);
 	        	   //connection = null;
 	        	   return;
 	    		}
@@ -289,13 +289,13 @@ public class XMPPService extends Service implements Observable {
 			//}
 			if (connection==null || !connection.isConnected() || !connection.isAuthenticated()) 
 			{
-				postMessage("SetLocation exitied: Bad connection",XMPPTypes.CONNECTION);
+				setState("SetLocation exitied: Bad connection",XMPPTypes.CONNECTION);
 				return;
 			}
 			// Create a pubsub manager using an existing Connection
 			PubSubManager mgr = new PubSubManager(connection,"pubsub." + HOST);
 						
-			postMessage("RTN PubSubMgr: " + mgr.toString(),XMPPTypes.CONNECTION);
+			setState("RTN PubSubMgr: " + mgr.toString(),XMPPTypes.CONNECTION);
 			LeafNode node =  mgr.getNode("Location");
 						
 		    if (node==null)
@@ -323,7 +323,7 @@ public class XMPPService extends Service implements Observable {
          
 				node.publish(item2);
 			
-				postMessage("SendLocation: " + item2.toString(),XMPPTypes.CONNECTION);
+				setState("SendLocation: " + item2.toString(),XMPPTypes.CONNECTION);
 			
 			}
 			
@@ -331,18 +331,18 @@ public class XMPPService extends Service implements Observable {
 			Log.e("PublishActivity::onCreate", "Did you register Smack's XMPP Providers and Extensions in advance? - " +
         		"SmackAndroid.init(this)?\n" + cce.getMessage());
 			cce.printStackTrace();
-			postMessage("Exception Ln 316: " + cce.toString(),XMPPTypes.CONNECTION);
+			setState("Exception Ln 316: " + cce.toString(),XMPPTypes.CONNECTION);
 			//connection = null;
 		} catch (XMPPException ex) {
 			Log.e("PublishActivity::onCreate", "XMPPException for '"+  USERNAME + "'");
 			ex.printStackTrace();
-			postMessage("Exception Ln 321: " + ex.toString(),XMPPTypes.CONNECTION);
+			setState("Exception Ln 321: " + ex.toString(),XMPPTypes.CONNECTION);
 			//connection = null;    
 		} catch (Exception e) {
 			//all other exceptions
 			Log.e("PublishActivity::onCreate", "Unhandled Exception"+  e.getMessage()); 
 			e.printStackTrace();
-			postMessage("Exception Ln 327: " + e.toString(),XMPPTypes.CONNECTION);
+			setState("Exception Ln 327: " + e.toString(),XMPPTypes.CONNECTION);
 			//connection = null;
 		}
 	}
@@ -450,7 +450,7 @@ public class XMPPService extends Service implements Observable {
 	 * 0 = Connection, 1=Chat
 	 */
 
-	public Object getUpdate(Observer obj, XMPPTypes type){
+	public Object getState(Observer obj, XMPPTypes type){
 		Object o = null;
 		synchronized (MUTEX) {
 			switch (type)
@@ -472,7 +472,7 @@ public class XMPPService extends Service implements Observable {
 	 * method to post message to the observer
 	 * 0 = Connection, 1=Chat
 	 */
-	public void postMessage(String msg, XMPPTypes type){
+	public void setState(String msg, XMPPTypes type){
 		
 		synchronized (MUTEX) {
 			DateFormat df = DateFormat.getTimeInstance();

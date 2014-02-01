@@ -13,6 +13,7 @@ public interface Observable {
     public void notifyObservers(XMPPTypes type);
   
     //method to get updates from subject
-    public Object getUpdate(Observer obj,XMPPTypes type);
+    public Object getState(Observer obj,XMPPTypes type);
   
+    public void setState(String msg, XMPPTypes type);
 }
