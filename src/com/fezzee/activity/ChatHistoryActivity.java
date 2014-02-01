@@ -10,6 +10,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+
 import com.fezzee.service.connection.R;
 
 /*
@@ -86,6 +89,40 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
                             .setIcon(R.drawable.chaticon)
                             .setTabListener(this));
         }
+        
+        Button send = (Button) this.findViewById(R.id.sendBtn);
+	    send.setOnClickListener(new View.OnClickListener() {
+	      public void onClick(View view) {
+	    	
+	        /*
+	        String text = textMessage.getText().toString();          
+	        Log.i("XMPPChatDemoActivity ", "Sending text " + text + " to " + recipient);
+	        Message msg = new Message(recipient, Message.Type.chat);  
+	        msg.setBody(text);
+	        if (LauncherActivity.connection != null) {
+	          //add checks here- should have something  to handle an empty recipient, but will do for now
+	        	Log.i("XMPPChatDemoActivity ", "TO len: " + recipient.trim().length() + " HOST Len: " + LauncherActivity.HOST.length());
+	          if (text.trim().length() > 0 && recipient.trim().length() > LauncherActivity.HOST.length() + 1 ) //+1 for @
+	          {
+	        	  LauncherActivity.connection.sendPacket(msg);
+	        	  //GM New
+		          String name = LauncherActivity.connection.getAccountManager().getAccountAttribute("name");
+		          //messages.add(connection.getUser() + ":");
+		          //messages.add(text);
+		          messages.add(name + ": " + text);
+		          setListAdapter();
+		          //GM New
+		          textMessage.setText("");
+		          InputMethodManager imm = (InputMethodManager)getSystemService(
+		        	      Context.INPUT_METHOD_SERVICE);
+		        	imm.hideSoftInputFromWindow(textMessage.getWindowToken(), 0);
+	          }
+	        }
+	        */
+	      }
+	    });
+        
+        
     }
 
     @Override
