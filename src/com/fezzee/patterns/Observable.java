@@ -10,10 +10,10 @@ public interface Observable {
     public void unregister(Observer obj, XMPPTypes type);
   
     //method to notify observers of change
-    public void notifyObservers(XMPPTypes type);
+    public void notifyObservers(XMPPTypes type, Object msg);
   
     //method to get updates from subject
     public Object getState(Observer obj,XMPPTypes type);
   
-    public void setState(String msg, XMPPTypes type);
+    public void setState(Object msg, XMPPTypes type);
 }

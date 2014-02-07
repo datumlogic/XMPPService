@@ -1,48 +1,57 @@
 package com.fezzee.activity;
 
 
+
+import java.util.Arrays;
+
 import android.app.ActionBar;
-import android.app.FragmentTransaction;
+import android.app.ActionBar.Tab;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.fezzee.patterns.Observable;
+import com.fezzee.patterns.Observer;
+import com.fezzee.persistance.PseudoDB;
 import com.fezzee.service.connection.R;
+import com.fezzee.types.XMPPTypes;
 
 /*
  * A fragment activity/view pagers representing all chats, both active and historical.
  */
 public class ChatHistoryActivity extends FragmentActivity implements ActionBar.TabListener {
 	
-	private static final String TAG = "ChatActivity";
+	private static final String TAG = "ChatHistoryActivity";
 	
-	private static final String[] collJIDS = {"gene2","gene3","gene5","gene6"};//for prototyping only
+	// for prototyping only
+	// for now the size will always equal
+	private static final String[] collJIDS = {"gene","gene2","gene3","gene5","gene6"};
+	private static PseudoDB msgDatabase;
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of the
-     * chats in the app. We use a {@link android.support.v4.app.FragmentPagerAdapter}
-     * derivative, which will keep every loaded fragment in memory. If this becomes too memory
-     * intensive, it may be best to switch to a {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    AppSectionsPagerAdapter mAppSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will display the three primary sections of the app, one at a
-     * time.
-     */
-    ViewPager mViewPager;
+    private AppSectionsPagerAdapter mAppSectionsPagerAdapter;
+    private ViewPager mViewPager;
     
     private static Bundle passedArgs;
+    
+    public ChatHistoryActivity()
+	{
+		super();
+		 //for prototyping
+        msgDatabase = new PseudoDB();
+	}
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        
+     
         
         //use a Bundle to pass args(JID from LocalBoundActivity) through this activity to fragment
         passedArgs = getIntent().getExtras();
@@ -93,58 +102,178 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         Button send = (Button) this.findViewById(R.id.sendBtn);
 	    send.setOnClickListener(new View.OnClickListener() {
 	      public void onClick(View view) {
-	    	
-	        /*
-	        String text = textMessage.getText().toString();          
-	        Log.i("XMPPChatDemoActivity ", "Sending text " + text + " to " + recipient);
-	        Message msg = new Message(recipient, Message.Type.chat);  
-	        msg.setBody(text);
-	        if (LauncherActivity.connection != null) {
-	          //add checks here- should have something  to handle an empty recipient, but will do for now
-	        	Log.i("XMPPChatDemoActivity ", "TO len: " + recipient.trim().length() + " HOST Len: " + LauncherActivity.HOST.length());
-	          if (text.trim().length() > 0 && recipient.trim().length() > LauncherActivity.HOST.length() + 1 ) //+1 for @
-	          {
-	        	  LauncherActivity.connection.sendPacket(msg);
-	        	  //GM New
-		          String name = LauncherActivity.connection.getAccountManager().getAccountAttribute("name");
-		          //messages.add(connection.getUser() + ":");
-		          //messages.add(text);
-		          messages.add(name + ": " + text);
-		          setListAdapter();
-		          //GM New
-		          textMessage.setText("");
-		          InputMethodManager imm = (InputMethodManager)getSystemService(
-		        	      Context.INPUT_METHOD_SERVICE);
-		        	imm.hideSoftInputFromWindow(textMessage.getWindowToken(), 0);
-	          }
-	        }
-	        */
+	    	  
+	    	  
+	    	  updateTest("gene2","my new Test");
+	    	 
 	      }
 	    });
+    }
+    
+    
+    
+    /*
+     * THIS IS THE MOST IMPORTANT METHOD IN THIS CLASS
+     * this HACK came from- see my note inline in comments as well
+     * http://stackoverflow.com/questions/12705342/refreshing-a-view-inside-a-fragment
+     */
+    
+    public void updateTest(String host, String msg) {
+    	
+    	
+    	
+    	 int pos = Arrays.asList(collJIDS).indexOf(host);
+    	 Log.e(TAG,collJIDS.toString());
+    	 if (pos == -1) 
+    	 {
+    		Log.e(TAG,"JID not found, can not update: '" + host+ "'");
+    		return; 
+    	 }
+    	 Log.e(TAG,"HERE: " + pos);
+    	 FragmentStatePagerAdapter a = (FragmentStatePagerAdapter)  mViewPager.getAdapter();
+    	 Log.e(TAG,"HERE2: " + pos);
+		 ChatFragment frag = (ChatFragment)a.instantiateItem( mViewPager, pos );
+		 //NOTE THAT THE INDEX OF THE PAGE YOU WANT TO UPDATE IS NEEDED- IT MUST MATCH
+		 //ArrayListFragment tempFrag = (ArrayListFragment) a.instantiateItem(mPager, 3);
+		 Log.e(TAG,"HERE3: " + pos);
+		 msgDatabase.setMessage(host, msg);
+		 Log.e(TAG,"HERE4");
+         
+		 if (mViewPager.getCurrentItem() == pos)
+		 {
+			 Log.e(TAG,"HERE - Current Pos: " + pos);
+			//this seems like a hack but it works to update the list if the list if the current page
+			 //just detaching and reattaching the fragment.
+			 //if you're not on the fragment thats being updated, this not required
+			 //but if its called when the page isn't the current  view (+/- 1 on either side) it causes a crash
+			 FragmentManager fragmentManager = getSupportFragmentManager();
+			 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+			 fragmentTransaction.detach(frag);
+			 fragmentTransaction.attach(frag);
+			 fragmentTransaction.commit();
+			 
+		 } else
+			 a.notifyDataSetChanged();
+    }
+    
+    
+	@Override
+	public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
+		
+	}
+
+	@Override
+	public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
+		 mViewPager.setCurrentItem(tab.getPosition());
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
+		
+	} 
+
+    /*
+     * This inner class i the Observer
+     */
+    public class AppSectionsPagerAdapter extends FragmentStatePagerAdapter implements Observer{
+    	
+        public AppSectionsPagerAdapter(FragmentManager fragmentManager) {
+        	super(fragmentManager);
+        	this.setObservable(MainConnectionActivity.myService);
+        }
+ 
+        @Override
+        public int getCount() {
+            return msgDatabase.size();
+        }
+ 
+        @Override
+        public Fragment getItem(int position) {
+        	    Log.d(TAG,"get Item called: " + position);
+            	return ChatFragment.init(collJIDS[position],msgDatabase.getMessages(collJIDS[position]));
+                
+        }
+        
+        @Override
+        public CharSequence getPageTitle(int position) {
+            //
+            return collJIDS[position];
+        }
         
         
+        /*
+    	 * adds clarity to the process?
+    	 * Replaced 
+    	 * 		myService = binder.getService();
+    	 * with
+    	 * 		setObservable(binder.getService());
+    	 * in 
+    	 * 		ServiceConnection::onServiceConnected
+    	 */
+    	@Override
+    	public void setObservable(Observable obj)
+    	{
+    	    obj.register(this, XMPPTypes.CHAT);
+    	}
+    	
+    	public int getId()
+    	{
+    		return ChatHistoryActivity.this.getTaskId();
+    	}
+        
+    	
+    	@Override
+    	public void update(final Object msg) {
+    		
+    		String jid = ((org.jivesoftware.smack.packet.Message)msg).getFrom();
+    		String host = jid.substring(0, jid.indexOf('@'));
+    		String body = ((org.jivesoftware.smack.packet.Message)msg).getBody();
+    		Log.e(TAG,"JID: '" + host + "'");
+    	    //ChatHistoryActivity.this.updateTest(host, body);
+    	    
+    	    int pos = Arrays.asList(collJIDS).indexOf(host);
+       	    if (pos == -1) 
+       	    {
+       		   Log.e(TAG,"JID not found, can not update: '" + host+ "'");
+       		   return; 
+       	    }
+       	    Log.e(TAG,"HERE: " + pos);
+       	    //FragmentStatePagerAdapter a = (FragmentStatePagerAdapter)  mViewPager.getAdapter();
+       	    //Log.e(TAG,"HERE2: " + pos);
+   		    ChatFragment frag = (ChatFragment)this.instantiateItem( ChatHistoryActivity.this.mViewPager, pos );
+   		    //Log.e(TAG,"HERE3: " + pos);
+   		    msgDatabase.setMessage(host, body);
+   		    //Log.e(TAG,"HERE4");
+           
+   		    if (mViewPager.getCurrentItem() == pos)
+   		    {
+   			    //this seems like a hack but it works to update the list if the list if the current page
+   			    //just detaching and reattaching the fragment.
+   			    //if you're not on the fragment thats being updated, this not required
+   			    //but if its called when the page isn't the current  view (+/- 1 on either side) it causes a crash
+   			    FragmentManager fragmentManager = getSupportFragmentManager();
+   			    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+   			    fragmentTransaction.detach(frag);
+   			    fragmentTransaction.attach(frag);
+   			    fragmentTransaction.commit();
+   		     }
+   		     
+   		     //this.notifyDataSetChanged();
+   		     //Log.e(TAG,"HERE-Done: " + pos); 
+   		     //getItem(pos);
+
+    	}
     }
 
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // When the given tab is selected, switch to the corresponding page in the ViewPager.
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
+}
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to one of the primary
      * sections of the app.
      * 
      * Maybe use FragmentStatePagerAdapter at a later stage to conserve memory?
-     */
+     
     public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
     	
 
@@ -191,6 +320,8 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         	
             return rtn;
         }
-    }
+        */
+   
+    
 
-}
+

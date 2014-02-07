@@ -25,7 +25,7 @@ import com.fezzee.service.connection.R;
 import com.fezzee.types.XMPPTypes;
 
 
-public class LocalBoundActivity extends Activity implements Observer{
+public class MainConnectionActivity extends Activity implements Observer{
 
 	public static XMPPService myService;    
 	private boolean isBound = false;
@@ -34,7 +34,7 @@ public class LocalBoundActivity extends Activity implements Observer{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_local_bound);
+		setContentView(R.layout.activity_main_connection);
 		
 		TextView textView = (TextView) this.findViewById(R.id.myTextView);
 		textView.setMovementMethod(new ScrollingMovementMethod());
@@ -109,7 +109,7 @@ public class LocalBoundActivity extends Activity implements Observer{
 				XMPPService.ConnectionBinder binder = (XMPPService.ConnectionBinder) service;        
 				   
 				setObservable(binder.getService());
-				myService.register(LocalBoundActivity.this, XMPPTypes.CONNECTION);
+				myService.register(MainConnectionActivity.this, XMPPTypes.CONNECTION);
 				myService.setState("Service Started",XMPPTypes.CONNECTION);
 				isBound = true;    
 			}        
@@ -135,14 +135,18 @@ public class LocalBoundActivity extends Activity implements Observer{
 		this.myService = (XMPPService)obj;
 	}
 	
-
+	
+	@Override
+    public int getId() {
+		return this.getId();
+	}
 	
 	//can be called from any thread
 	@Override
-	public void update() {
+	public void update(final Object msg) {
 		this.runOnUiThread(new Runnable() {
 		    public void run() {
-		    	String serviceVal = (String) myService.getState(LocalBoundActivity.this,XMPPTypes.CONNECTION);
+		    	String serviceVal = msg.toString();//(String) myService.getState(MainConnectionActivity.this,XMPPTypes.CONNECTION);
 				final TextView myTextView = (TextView)findViewById(R.id.myTextView);  
 				myTextView.append(serviceVal+"\n");//
 				if (myTextView.getLineCount()>0)

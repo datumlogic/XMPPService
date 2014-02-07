@@ -26,6 +26,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.fezzee.patterns.Observable;
@@ -231,7 +232,7 @@ public class XMPPService extends Service implements Observable {
 	    			
 	    			ChatManager chatman = connection.getChatManager();
 	    			chatMediator = new XMPPChatMediator(chatman, XMPPService.this);
-	    			chatman.addChatListener(new XMPPChatListener());
+	    			chatman.addChatListener(new XMPPChatListener(XMPPService.this));
 	    			
 	    			//connection.getChatManager().addChatListener(new ChatObserver());
 	    			
@@ -371,7 +372,7 @@ public class XMPPService extends Service implements Observable {
 				break;
 			case CHAT:
 				if(!chatObservers.contains(obj)) {
-					Log.d(TAG,"Chat Observer Added");
+					Log.e(TAG,"Chat Observer Added: " + obj.getId());
 					chatObservers.add(obj);
 				}
 				break;
@@ -395,7 +396,7 @@ public class XMPPService extends Service implements Observable {
 	}
 
 	//method to notify observers of change
-	public void notifyObservers(XMPPTypes type){
+	public void notifyObservers(XMPPTypes type, Object msg){
 
 		List<Observer> observersLocal = null;
 		
@@ -416,7 +417,7 @@ public class XMPPService extends Service implements Observable {
 				int i = 0;
 				for (Observer obj : observersLocal) {
 					Log.d(TAG,"Obj 0 notified: " + i);
-					obj.update();
+					obj.update(msg);
 					i++;
 				}
 				break;
@@ -434,8 +435,8 @@ public class XMPPService extends Service implements Observable {
 		
 				int j = 0;
 				for (Observer obj : observersLocal) {
-					Log.d(TAG,"Obj 1 notified: " + j);
-					obj.update();
+					Log.d(TAG,"Obj 1 notified: " + ((org.jivesoftware.smack.packet.Message)msg).getFrom());
+					obj.update(msg);
 					j++;
 				}
 				break;
@@ -472,7 +473,7 @@ public class XMPPService extends Service implements Observable {
 	 * method to post message to the observer
 	 * 0 = Connection, 1=Chat
 	 */
-	public void setState(String msg, XMPPTypes type){
+	public void setState(Object msg, XMPPTypes type){
 		
 		synchronized (MUTEX) {
 			DateFormat df = DateFormat.getTimeInstance();
@@ -482,18 +483,19 @@ public class XMPPService extends Service implements Observable {
 			switch (type)
 			{
 				case CONNECTION:
-					Log.v("POST MESSAGE",msg);
 					this.message0= "[" + gmtTime +"] "+ msg;
+					Log.v(TAG+":setState",this.message0);
 					this.changed0=true;
 					break;
 				case CHAT:
-					Log.v("POST MESSAGE",msg);
-					this.message1= "[" + gmtTime +"] "+ msg;
+					this.message1= "[" + gmtTime +"] --"+ ((org.jivesoftware.smack.packet.Message)msg).getFrom() + "-- " +
+												((org.jivesoftware.smack.packet.Message)msg).getBody();
+					Log.v(TAG+":setState",this.message1);
 					this.changed1=true;
 					break;
 			}
 
-			notifyObservers(type);
+			notifyObservers(type, msg);
 		}
 
 	}

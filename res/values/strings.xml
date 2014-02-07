@@ -8,5 +8,5 @@
     <string name="action_chat">Chat</string>
     <string name="textChat">Chat</string>
     <string name="btn2Text">Send Time Msg</string>
-    <string name="dummy_text">Chat Window %1s</string>
+    <string name="dummy_text">%s</string>
 </resources>
