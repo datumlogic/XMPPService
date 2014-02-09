@@ -7,24 +7,28 @@ import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Message;
 
+import com.fezzee.activity.MainConnectionActivity;
+import com.fezzee.persistance.PseudoDB;
 import com.fezzee.types.XMPPTypes;
 
 import android.util.Log;
 
 /*
- * 
+ * Persists chat in background to DB
  */
 public class XMPPChatMediator {
 	
 	private ChatManager manager;
 	private final String TAG = "ChatMediator";
-	private ArrayList<ChatManager> activeChats;
+	public PseudoDB msgDatabase;// = new PseudoDB();
 	private XMPPService service;
 
 	public XMPPChatMediator(ChatManager chatManager, XMPPService service){
-		this.activeChats = new ArrayList<ChatManager>();
+		//this.activeChats = new ArrayList<ChatManager>();
 		this.manager = chatManager;
 		this.service = service;
+		msgDatabase = new PseudoDB();
+		msgDatabase.setObservable(this.service);
 	}
 	
 	public void registerChat(String jid) {

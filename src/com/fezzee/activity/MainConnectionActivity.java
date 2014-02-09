@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.fezzee.patterns.Observable;
 import com.fezzee.patterns.Observer;
+import com.fezzee.persistance.PseudoDB;
 import com.fezzee.service.XMPPService;
 import com.fezzee.service.connection.R;
 import com.fezzee.types.XMPPTypes;
@@ -90,7 +91,10 @@ public class MainConnectionActivity extends Activity implements Observer{
 	    switch (item.getItemId()) {
 	   
 	    	case R.id.action_chat:
-	    		Intent i = new Intent(getBaseContext(), ChatHistoryActivity.class);
+	    		
+	    		Intent i = new Intent(getBaseContext(),ChatHistoryActivity.class);
+	    		ChatHistoryActivity.setChatDatabase((PseudoDB)myService.getChatDatabase());
+	    		new Intent();
 	    		i.putExtra("JID", "gene");
 	    		startActivity(i);
 	    		return true;
@@ -136,10 +140,10 @@ public class MainConnectionActivity extends Activity implements Observer{
 	}
 	
 	
-	@Override
-    public int getId() {
-		return this.getId();
-	}
+	//@Override
+    //public int getId() {
+	//	return this.getId();
+	//}
 	
 	//can be called from any thread
 	@Override

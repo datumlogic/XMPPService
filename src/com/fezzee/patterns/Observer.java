@@ -8,5 +8,5 @@ public interface Observer {
      //attach with message to observe
      public void setObservable(Observable observable);
      
-     public int getId();
+     //public int getId();
 }

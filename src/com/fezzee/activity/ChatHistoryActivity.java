@@ -33,6 +33,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
 	// for prototyping only
 	// for now the size will always equal
 	private static final String[] collJIDS = {"gene","gene2","gene3","gene5","gene6"};
+	
 	private static PseudoDB msgDatabase;
 
     private AppSectionsPagerAdapter mAppSectionsPagerAdapter;
@@ -43,9 +44,14 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
     public ChatHistoryActivity()
 	{
 		super();
-		 //for prototyping
-        msgDatabase = new PseudoDB();
+		
 	}
+    
+    public static void setChatDatabase(PseudoDB db)
+    {
+    	 //for prototyping
+        msgDatabase = db;
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,57 +110,13 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
 	      public void onClick(View view) {
 	    	  
 	    	  
-	    	  updateTest("gene2","my new Test");
+	    	  //updateTest("gene2","my new Test");
 	    	 
 	      }
 	    });
     }
     
-    
-    
-    /*
-     * THIS IS THE MOST IMPORTANT METHOD IN THIS CLASS
-     * this HACK came from- see my note inline in comments as well
-     * http://stackoverflow.com/questions/12705342/refreshing-a-view-inside-a-fragment
-     */
-    
-    public void updateTest(String host, String msg) {
-    	
-    	
-    	
-    	 int pos = Arrays.asList(collJIDS).indexOf(host);
-    	 Log.e(TAG,collJIDS.toString());
-    	 if (pos == -1) 
-    	 {
-    		Log.e(TAG,"JID not found, can not update: '" + host+ "'");
-    		return; 
-    	 }
-    	 Log.e(TAG,"HERE: " + pos);
-    	 FragmentStatePagerAdapter a = (FragmentStatePagerAdapter)  mViewPager.getAdapter();
-    	 Log.e(TAG,"HERE2: " + pos);
-		 ChatFragment frag = (ChatFragment)a.instantiateItem( mViewPager, pos );
-		 //NOTE THAT THE INDEX OF THE PAGE YOU WANT TO UPDATE IS NEEDED- IT MUST MATCH
-		 //ArrayListFragment tempFrag = (ArrayListFragment) a.instantiateItem(mPager, 3);
-		 Log.e(TAG,"HERE3: " + pos);
-		 msgDatabase.setMessage(host, msg);
-		 Log.e(TAG,"HERE4");
-         
-		 if (mViewPager.getCurrentItem() == pos)
-		 {
-			 Log.e(TAG,"HERE - Current Pos: " + pos);
-			//this seems like a hack but it works to update the list if the list if the current page
-			 //just detaching and reattaching the fragment.
-			 //if you're not on the fragment thats being updated, this not required
-			 //but if its called when the page isn't the current  view (+/- 1 on either side) it causes a crash
-			 FragmentManager fragmentManager = getSupportFragmentManager();
-			 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-			 fragmentTransaction.detach(frag);
-			 fragmentTransaction.attach(frag);
-			 fragmentTransaction.commit();
-			 
-		 } else
-			 a.notifyDataSetChanged();
-    }
+
     
     
 	@Override
@@ -189,7 +151,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
  
         @Override
         public Fragment getItem(int position) {
-        	    Log.d(TAG,"get Item called: " + position);
+        	    Log.d(TAG,"getItem() called: " + position + " : " + collJIDS[position] + " : " + msgDatabase.getMessages(collJIDS[position]));
             	return ChatFragment.init(collJIDS[position],msgDatabase.getMessages(collJIDS[position]));
                 
         }
@@ -216,37 +178,39 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
     	    obj.register(this, XMPPTypes.CHAT);
     	}
     	
-    	public int getId()
-    	{
-    		return ChatHistoryActivity.this.getTaskId();
-    	}
+    	//public int getId()
+    	//{
+    	//	return ChatHistoryActivity.this.getTaskId();
+    	//}
         
     	
+    	 /*
+         * THIS IS THE MOST IMPORTANT METHOD IN THIS CLASS
+         * this HACK came from- see my note inline in comments as well
+         * http://stackoverflow.com/questions/12705342/refreshing-a-view-inside-a-fragment
+         */
     	@Override
     	public void update(final Object msg) {
     		
     		String jid = ((org.jivesoftware.smack.packet.Message)msg).getFrom();
     		String host = jid.substring(0, jid.indexOf('@'));
-    		String body = ((org.jivesoftware.smack.packet.Message)msg).getBody();
-    		Log.e(TAG,"JID: '" + host + "'");
-    	    //ChatHistoryActivity.this.updateTest(host, body);
+    		//String body = ((org.jivesoftware.smack.packet.Message)msg).getBody();
+    		Log.e(TAG,"update() JID: '" + host + "'");
+
     	    
     	    int pos = Arrays.asList(collJIDS).indexOf(host);
        	    if (pos == -1) 
        	    {
-       		   Log.e(TAG,"JID not found, can not update: '" + host+ "'");
+       		   Log.e(TAG,"update() JID not found, can not update: '" + host+ "'");
        		   return; 
        	    }
-       	    Log.e(TAG,"HERE: " + pos);
-       	    //FragmentStatePagerAdapter a = (FragmentStatePagerAdapter)  mViewPager.getAdapter();
-       	    //Log.e(TAG,"HERE2: " + pos);
+
    		    ChatFragment frag = (ChatFragment)this.instantiateItem( ChatHistoryActivity.this.mViewPager, pos );
-   		    //Log.e(TAG,"HERE3: " + pos);
-   		    msgDatabase.setMessage(host, body);
-   		    //Log.e(TAG,"HERE4");
-           
-   		    if (mViewPager.getCurrentItem() == pos)
+   		    //msgDatabase.setMessage(host, body);
+  		    
+   		    if (mViewPager.getCurrentItem() == pos || mViewPager.getCurrentItem() == pos-1 || mViewPager.getCurrentItem() == pos+1)
    		    {
+   		         Log.e(TAG,"Current page visible ******");
    			    //this seems like a hack but it works to update the list if the list if the current page
    			    //just detaching and reattaching the fragment.
    			    //if you're not on the fragment thats being updated, this not required
@@ -256,13 +220,12 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
    			    fragmentTransaction.detach(frag);
    			    fragmentTransaction.attach(frag);
    			    fragmentTransaction.commit();
-   		     }
-   		     
-   		     //this.notifyDataSetChanged();
-   		     //Log.e(TAG,"HERE-Done: " + pos); 
-   		     //getItem(pos);
+   			    
+   		     } 	 
 
     	}
+    	
+    	
     }
 
 

@@ -131,6 +131,11 @@ public class XMPPService extends Service implements Observable {
 		connection = new XMPPConnection(connConfig);
 		connection.addConnectionListener(new XMPPConnectionListener(this));
 		
+		ChatManager chatman = connection.getChatManager();
+		chatMediator = new XMPPChatMediator(chatman, XMPPService.this);
+		
+		chatman.addChatListener(new XMPPChatListener(XMPPService.this));
+		
 	}
 	
 	
@@ -187,6 +192,19 @@ public class XMPPService extends Service implements Observable {
 	}
 	
 	/*
+	 * Returns message Database
+	 */
+	public Object getChatDatabase() 
+	{
+		if (chatMediator == null)
+		{
+			throw new IllegalStateException("ChatMediator is NULL");
+		
+		}
+		return chatMediator.msgDatabase;
+	}
+	
+	/*
 	 * the the primary method
 	 */
 	public void connect()
@@ -230,9 +248,7 @@ public class XMPPService extends Service implements Observable {
 	    			connection.sendPacket(presence);
 	    			
 	    			
-	    			ChatManager chatman = connection.getChatManager();
-	    			chatMediator = new XMPPChatMediator(chatman, XMPPService.this);
-	    			chatman.addChatListener(new XMPPChatListener(XMPPService.this));
+	    			
 	    			
 	    			//connection.getChatManager().addChatListener(new ChatObserver());
 	    			
@@ -372,7 +388,7 @@ public class XMPPService extends Service implements Observable {
 				break;
 			case CHAT:
 				if(!chatObservers.contains(obj)) {
-					Log.e(TAG,"Chat Observer Added: " + obj.getId());
+					Log.d(TAG,"Chat Observer Added");
 					chatObservers.add(obj);
 				}
 				break;

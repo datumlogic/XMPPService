@@ -3,7 +3,13 @@ package com.fezzee.persistance;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PseudoDB {
+import android.util.Log;
+
+import com.fezzee.patterns.Observable;
+import com.fezzee.patterns.Observer;
+import com.fezzee.types.XMPPTypes;
+
+public class PseudoDB implements Observer {
 	
 	//stores messages
     //the pseudo DB here is a hashmap (objects stored by key) of a Deque (a queue  that can be read from either end)
@@ -19,7 +25,7 @@ public class PseudoDB {
 		    msgDatabase.put("gene3", new ArrayList<String>());
 		    msgDatabase.put("gene5", new ArrayList<String>());
 		    msgDatabase.put("gene6", new ArrayList<String>());
-			
+			/*
 			setMessage("gene", "Chat Window 1- Gene");
 			setMessage("gene", "This is");
 			setMessage("gene", "a Fezzee");
@@ -74,6 +80,7 @@ public class PseudoDB {
 			setMessage("gene6", "FragmentStatePagerAdapter");
 			setMessage("gene6", "and ViewPager");
 			setMessage("gene6", "Implementation");
+			*/
 		
 	}
 	
@@ -94,6 +101,29 @@ public class PseudoDB {
 	public int size()
 	{
 		return msgDatabase.size();
+	}
+	
+   	@Override
+	public void setObservable(Observable obj)
+	{
+	    obj.register(this, XMPPTypes.CHAT);
+	}
+	
+	
+	 /*
+     * THIS IS THE MOST IMPORTANT METHOD IN THIS CLASS
+     * this HACK came from- see my note inline in comments as well
+     * http://stackoverflow.com/questions/12705342/refreshing-a-view-inside-a-fragment
+     */
+	@Override
+	public void update(final Object msg) {
+		
+		String jid = ((org.jivesoftware.smack.packet.Message)msg).getFrom();
+		String host = jid.substring(0, jid.indexOf('@'));
+		String body = ((org.jivesoftware.smack.packet.Message)msg).getBody();
+
+		this.setMessage(host, body);
+        
 	}
 	
 }
