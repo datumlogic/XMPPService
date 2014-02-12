@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">LocalBoundConnectionDemo</string>
+    <string name="action_settings">Settings</string>
+    <string name="textMain"></string>
+    <string name="btnText">Check Connection</string>
+    <string name="action_chat">Chat</string>
+    <string name="textChat">Chat</string>
+    <string name="btn2Text">Send Time Msg</string>
+    <string name="dummy_text">%s</string>
+<<<<<<< HEAD
+    <string name="action_favs">Friends</string>
+=======
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
+</resources>

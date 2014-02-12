@@ -21,10 +21,17 @@ public class PseudoDB implements Observer {
 		    msgDatabase = new HashMap<String,ArrayList<String>>();
 		    
 		    msgDatabase.put("gene", new ArrayList<String>());
+<<<<<<< HEAD
 		    //msgDatabase.put("gene2", new ArrayList<String>());
 		    //msgDatabase.put("gene3", new ArrayList<String>());
 		    //msgDatabase.put("gene5", new ArrayList<String>());
 		    //msgDatabase.put("gene6", new ArrayList<String>());
+			
+=======
+		    msgDatabase.put("gene2", new ArrayList<String>());
+		    msgDatabase.put("gene3", new ArrayList<String>());
+		    msgDatabase.put("gene5", new ArrayList<String>());
+		    msgDatabase.put("gene6", new ArrayList<String>());
 			/*
 			setMessage("gene", "Chat Window 1- Gene");
 			setMessage("gene", "This is");
@@ -81,6 +88,7 @@ public class PseudoDB implements Observer {
 			setMessage("gene6", "and ViewPager");
 			setMessage("gene6", "Implementation");
 			*/
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
 		
 	}
 	

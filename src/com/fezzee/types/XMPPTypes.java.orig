@@ -1,0 +1,9 @@
+package com.fezzee.types;
+
+public enum XMPPTypes {
+<<<<<<< HEAD
+	CONNECTION, CHAT, PERSISTANCE
+=======
+	CONNECTION, CHAT
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
+}

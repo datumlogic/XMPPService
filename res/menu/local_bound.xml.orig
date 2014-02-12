@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_chat"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_chat"/>
+<<<<<<< HEAD
+    
+     <item
+        android:id="@+id/action_favs"
+        android:orderInCategory="101"
+        android:showAsAction="never"
+        android:title="@string/action_favs"/>
+=======
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
+
+</menu>

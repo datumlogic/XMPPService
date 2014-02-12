@@ -60,7 +60,10 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
      
         
         //use a Bundle to pass args(JID from LocalBoundActivity) through this activity to fragment
+<<<<<<< HEAD
         //FIXME: Not doing anything with the JID passed to this Activity
+=======
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
         passedArgs = getIntent().getExtras();
         
 
@@ -165,26 +168,34 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         
         
         /*
+<<<<<<< HEAD
+    	 * 
+=======
     	 * adds clarity to the process?
     	 * Replaced 
     	 * 		myService = binder.getService();
     	 * with
     	 * 		setObservable(binder.getService());
-    	 * 
+    	 * in 
     	 * 		ServiceConnection::onServiceConnected
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
     	 */
     	@Override
     	public void setObservable(Observable obj)
     	{
     	    obj.register(this, XMPPTypes.CHAT);
     	}
+<<<<<<< HEAD
 
+=======
+    	
     	//public int getId()
     	//{
     	//	return ChatHistoryActivity.this.getTaskId();
     	//}
         
     	
+>>>>>>> 93ffe466547991557c5c0eed23c848e24d1babbf
     	 /*
          * THIS IS THE MOST IMPORTANT METHOD IN THIS CLASS
          * this HACK came from- see my note inline in comments as well
