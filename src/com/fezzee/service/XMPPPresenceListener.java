@@ -7,14 +7,11 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.packet.VCard;
-import org.jivesoftware.smackx.provider.VCardProvider;
+import com.fezzee.service.connection.R;
 
 import android.util.Log;
 
 import com.fezzee.persistance.FavoriteItem;
-import com.fezzee.service.connection.R;
 import com.fezzee.types.XMPPTypes;
 
 
@@ -41,7 +38,7 @@ public class XMPPPresenceListener implements RosterListener {
             //if we find any existing jid's in the param collection, remove it from the param colection
     		for (int i = 0; i < XMPPPresenceMediator.contacts.size(); i++)
             {
-            	FavoriteItem fav= mediator.contacts.get(i);
+            	FavoriteItem fav= XMPPPresenceMediator.contacts.get(i);
             	if ( param.contains(fav.getJID()))
             	{
             		Log.v(TAG + "::entriesAdded",  "User Found, so removing it");

@@ -9,12 +9,10 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-
 import android.util.Log;
-
 import com.fezzee.persistance.FavoriteItem;
-import com.fezzee.service.connection.R;
 import com.fezzee.types.XMPPTypes;
+import com.fezzee.service.connection.R;
 
 public class XMPPPresenceMediator {
 	

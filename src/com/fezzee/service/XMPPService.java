@@ -514,28 +514,10 @@ public class XMPPService extends Service implements Observable {
 					obj.update(msg);
 					k++;
 				}
- 
-
-	/*
-	 * method to get updates from observer
-	 * 0 = Connection, 1=Chat
-	 */
-
-	public Object getState(Observer obj, XMPPTypes type){
-		Object o = null;
-		synchronized (MUTEX) {
-			switch (type)
-			{
-				case CONNECTION:
-					o = this.message0;
-				break;
-				case CHAT:
-					o = this.message1;
-			
 		}
-		
-		return o;
+ 
 	}
+
  
 
     
@@ -548,24 +530,6 @@ public class XMPPService extends Service implements Observable {
 		
 		synchronized (MUTEX) {
 			
-			//DateFormat df = DateFormat.getTimeInstance();
-			//df.setTimeZone(TimeZone.getTimeZone("gmt"));
-			//String gmtTime = df.format(new Date());
-			
-			switch (type)
-			{
-				case CONNECTION:
-					this.message0= "[" + gmtTime +"] "+ msg;
-					Log.v(TAG+":setState",this.message0);
-					this.changed0=true;
-					break;
-				case CHAT:
-					this.message1= "[" + gmtTime +"] --"+ ((org.jivesoftware.smack.packet.Message)msg).getFrom() + "-- " +
-												((org.jivesoftware.smack.packet.Message)msg).getBody();
-					Log.v(TAG+":setState",this.message1);
-					this.changed1=true;
-					break;
-			}
 
 			notifyObservers(type, msg);
 		}

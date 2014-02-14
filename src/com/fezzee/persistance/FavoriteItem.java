@@ -1,7 +1,12 @@
 package com.fezzee.persistance;
 
+import java.util.Comparator;
+import java.util.Date;
 
-public class FavoriteItem {
+import android.util.Log;
+
+
+public class FavoriteItem  {
 	
 	public enum PresenceState {
 		AVAILABLE, UNAVILABLE, NOTIFIED 
@@ -12,6 +17,7 @@ public class FavoriteItem {
 	private String name; //friendly name
 	private PresenceState presence;
 	private String status;
+	private Date lastMessage;//UTC time
 
 	public FavoriteItem(String jid, int imageId, String name, String status, PresenceState presence) {
 	    this.imageId = imageId;
@@ -19,7 +25,26 @@ public class FavoriteItem {
 	    this.status = status;//change this to an int?
 	    this.presence = presence;
 	    this.jid = jid;
+	    this.lastMessage = new Date();
 	}
+	//just set the JID
+	public FavoriteItem(String jid) {
+	    this.jid = jid;
+	    this.name = jid.split("@")[0]; //FIXME: 
+	    this.lastMessage = new Date();
+	}
+	
+	
+	public void setMessageDateTime(Date utcDateTime)
+	{
+		this.lastMessage = utcDateTime;
+	}
+	
+	public Date  getMessageDateTime()
+	{
+		return this.lastMessage;
+	}
+	
 	public int getImageId() {
 	    return imageId;
 	}

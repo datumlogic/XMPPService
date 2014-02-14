@@ -32,7 +32,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
 	
 	// for prototyping only
 	// for now the size will always equal
-	private static final String[] collJIDS = {"gene","gene2","gene3","gene5","gene6"};
+	//private static final String[] collJIDS = {"gene1","gene2","gene3","gene5","gene6"};
 	
 	private static PseudoDB msgDatabase;
 
@@ -63,6 +63,11 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         //FIXME: Not doing anything with the JID passed to this Activity
         passedArgs = getIntent().getExtras();
         
+        Log.v(TAG+"::onCreate","passedArgs: "+ passedArgs);
+        
+        String selectedJID = passedArgs.getString("JID");
+        
+        Log.v(TAG+"::onCreate","passed JID: "+ selectedJID);
 
         // Create the adapter that will return a fragment for each of the three primary sections
         // of the app.
@@ -147,31 +152,27 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
  
         @Override
         public int getCount() {
+        	Log.e(TAG,"SIZE::::::::::::" + msgDatabase.size());
             return msgDatabase.size();
         }
  
         @Override
         public Fragment getItem(int position) {
-        	    Log.d(TAG,"getItem() called: " + position + " : " + collJIDS[position] + " : " + msgDatabase.getMessages(collJIDS[position]));
-            	return ChatFragment.init(collJIDS[position],msgDatabase.getMessages(collJIDS[position]));
+        	   //containsJID returns the messages if the JID exists
+        	    Log.d(TAG,"getItem() called: " + position + " : " + msgDatabase.getNames()[position] + " : " + msgDatabase.ifContainsJidReturnMsgs(msgDatabase.getNames()[position]));
+            	return ChatFragment.init(msgDatabase.getNames()[position],msgDatabase.ifContainsJidReturnMsgs(msgDatabase.getNames()[position]));
                 
         }
         
         @Override
         public CharSequence getPageTitle(int position) {
             //
-            return collJIDS[position];
+            return msgDatabase.getNames()[position];
         }
         
         
         /*
-    	 * adds clarity to the process?
-    	 * Replaced 
-    	 * 		myService = binder.getService();
-    	 * with
-    	 * 		setObservable(binder.getService());
-    	 * 
-    	 * 		ServiceConnection::onServiceConnected
+    	 *
     	 */
     	@Override
     	public void setObservable(Observable obj)
@@ -199,7 +200,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
     		Log.e(TAG,"update() JID: '" + host + "'");
 
     	    
-    	    int pos = Arrays.asList(collJIDS).indexOf(host);
+    	    int pos = Arrays.asList(msgDatabase.getNames()).indexOf(host);
        	    if (pos == -1) 
        	    {
        		   Log.e(TAG,"update() JID not found, can not update: '" + host+ "'");
@@ -221,71 +222,12 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
    			    fragmentTransaction.detach(frag);
    			    fragmentTransaction.attach(frag);
    			    fragmentTransaction.commit();
-   			    
    		     } 	 
-
     	}
-    	
-    	
-    }
+    }// end of inner class AppSectionsPagerAdapter
+}// end of class ChatHistoryAdapter
 
 
-}
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to one of the primary
-     * sections of the app.
-     * 
-     * Maybe use FragmentStatePagerAdapter at a later stage to conserve memory?
-     
-    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
-    	
-
-        public AppSectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-        	Fragment fragment;
-            switch (i) {
-                case 0:
-                	// The first Fragment (leftmost) passes in the JID (from passedArgs Bundle) of the selected item
-                	fragment = new ChatFragment();
-                	//Bundle args = new Bundle();
-                	passedArgs.putInt(ChatFragment.ARG_SECTION_NUMBER, i + 1);
-                	fragment.setArguments(passedArgs);
-                	return fragment;
-
-                default:
-                    // The other sections PASS IN JID's from the service(?)
-                    fragment = new ChatFragment();
-                    Bundle args = new Bundle();
-                    args.putInt(ChatFragment.ARG_SECTION_NUMBER, i + 1);
-                    args.putString("JID", collJIDS[i-1]);//prototype hack
-                    fragment.setArguments(args);
-                    return fragment;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return 5;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-        	String rtn;// = "Chat " + (position + 1);
-        	Log.d(TAG,"POSITION>>>>" + position);
-        	if (position==0) 
-        		rtn = "gene";
-        	else
-        		rtn = collJIDS[position-1];
-        	
-            return rtn;
-        }
-        */
-   
     
 
 
