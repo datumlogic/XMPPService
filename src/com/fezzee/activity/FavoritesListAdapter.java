@@ -6,7 +6,6 @@ import java.util.List;
 import org.jivesoftware.smack.packet.Presence;
 
 import android.app.Activity;
-import android.app.LauncherActivity;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,21 +16,21 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.fezzee.persistance.FavoriteItem;
-import com.fezzee.persistance.FavoriteItem.PresenceState;
+import com.fezzee.data.ChatCollection;
+import com.fezzee.data.ChatCollection.ChatObject;
+import com.fezzee.data.ChatCollection.PresenceState;
 import com.fezzee.service.connection.R;
 //import com.theopentutorials.android.R;
 //import com.theopentutorials.android.beans.RowItem;
  
-public class FavoritesListAdapter extends ArrayAdapter<FavoriteItem> {
+public class FavoritesListAdapter extends ArrayAdapter<ChatObject> {
 	
 	private static final String TAG = "FavoritesListAdapter";
  
     Context context;
  
     public FavoritesListAdapter(Context context, int resourceId,
-            List<FavoriteItem> items) {
+            List<ChatObject> items) {
         super(context, resourceId, items);
         this.context = context;
     }
@@ -48,9 +47,9 @@ public class FavoritesListAdapter extends ArrayAdapter<FavoriteItem> {
  
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
-        final FavoriteItem rowItem = getItem(position);
+        final ChatObject rowItem = getItem(position);
         
-        //Log.e(TAG+"::getView","Started");
+        //Log.v(TAG+"::getView","Started");
  
         LayoutInflater mInflater = (LayoutInflater) context
                 .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -68,7 +67,7 @@ public class FavoritesListAdapter extends ArrayAdapter<FavoriteItem> {
         } else
             holder = (ViewHolder) convertView.getTag();
  
-        if (rowItem.getPresence() != FavoriteItem.PresenceState.NOTIFIED){
+        if (rowItem.getPresence() != PresenceState.NOTIFIED){
         	 holder.btnActivate.setVisibility(View.GONE);
         	 holder.btnBlock.setVisibility(View.GONE);
         	 holder.txtStatus.setVisibility(View.VISIBLE);
@@ -122,7 +121,7 @@ public class FavoritesListAdapter extends ArrayAdapter<FavoriteItem> {
     }
     
     
-    public int getPresenceImageRef(FavoriteItem.PresenceState pres)
+    public int getPresenceImageRef(PresenceState pres)
     {
     	int rtn = -1;
     	switch(pres)

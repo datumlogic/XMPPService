@@ -2,8 +2,8 @@ package com.fezzee.activity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.fezzee.data.ChatCollection;
 import com.fezzee.service.connection.R;
 
 
@@ -34,36 +35,37 @@ public class ChatFragment extends ListFragment {
     
     ListAdapter listAdapter;
     
-    //private XMPPService myService;    
-	//private boolean isBound = false;
     
     private static HashMap<String,ChatFragment> mFragments = new HashMap<String,ChatFragment>();
     
-    ArrayList<String> arr;
+    public CopyOnWriteArrayList<ChatCollection.ChatMessage> messages;
 
-    static ChatFragment init(String jidHost, ArrayList<String> msg) {
+    static ChatFragment init(String jidHost, String name, CopyOnWriteArrayList<ChatCollection.ChatMessage> msgs) {
     	
     	ChatFragment chatList;
     	if (mFragments.containsKey(jidHost))
     	{
     		chatList = mFragments.get(jidHost);
-    		Log.e(TAG,"init(): FOUND: " + chatList);
+    		Log.v(TAG,"init(): FOUND: " + chatList);
     	}
     	else
     	{
     		chatList = new ChatFragment();
-    		chatList.arr = (ArrayList<String>)msg;
+    		chatList.messages = (CopyOnWriteArrayList<ChatCollection.ChatMessage>)msgs;
     		mFragments.put(jidHost, chatList);
-    		Log.e(TAG,"init(): CREATED: " + chatList + " : " + chatList.arr );
+    		Log.v(TAG,"init(): CREATED: " + chatList + " : " + chatList.messages );
     		
     	}
        
         
-        //chatList.arr = (ArrayList<String>)msg.clone();
-        
         Bundle args = new Bundle();
         args.putString("jid", jidHost);
-        chatList.setArguments(args);
+        args.putString("name", name);
+        //try{
+        	chatList.setArguments(args);
+        //} catch (IllegalStateException ese) {
+        	
+        //}
  
         return chatList;
     }
@@ -80,14 +82,21 @@ public class ChatFragment extends ListFragment {
         final Bundle args = getArguments();
         
         //Log.d(TAG,"Chat Index: " + args.getInt(ARG_SECTION_NUMBER));
-        Log.e(TAG,"onCreateView(): " + args.getString("jid"));
+        Log.v(TAG,"onCreateView(): " + args.getString("jid"));
        
-        
+       //This is the Bottom Bar in the Chat window- that has the name of the person you're chatting to. 
         ((TextView) rootView.findViewById(R.id.text)).setText(
-                getString(R.string.dummy_text, args.getString("jid"))); //args.getInt(ARG_SECTION_NUMBER)));
+                getString(R.string.dummy_text, args.getString("name"))); //args.getInt(ARG_SECTION_NUMBER)));
+        
+        //this stopped my crashing issue when I used the full JID rather than just the ID before the @ to init  the PseudoDB with dummy data
+        if (this.messages==null)
+        {
+        	this.messages = new CopyOnWriteArrayList<ChatCollection.ChatMessage>();
+        	Log.e(TAG+"::onCreateView", "CRASH AVOIDED: Messages are null: Created empty messages arraylist");
+        }
         
         listAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, arr);
+                android.R.layout.simple_list_item_1, this.messages);
         /*
         ListView lv = ((ListView) rootView.findViewById(android.R.id.list));
         if (listAdapter != null)
@@ -96,7 +105,8 @@ public class ChatFragment extends ListFragment {
         	Log.e(TAG,"listAdapter is NULL");
         */
         
-        MainConnectionActivity.myService.createChat(args.getString("jid") + "@ec2-54-201-47-27.us-west-2.compute.amazonaws.com");
+        //MainConnectionActivity.myService.createChat(args.getString("jid") + "@ec2-54-201-47-27.us-west-2.compute.amazonaws.com");
+        MainConnectionActivity.myService.createChat(args.getString("jid"));
         
         return rootView;
     }
@@ -105,7 +115,7 @@ public class ChatFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        Log.e(TAG,"onActivityCreated() ");
+        Log.v(TAG,"onActivityCreated() ");
         
          
         setListAdapter(listAdapter);

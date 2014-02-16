@@ -18,12 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.fezzee.data.ChatCollection;
+import com.fezzee.data.XMPPListenerTypes;
 import com.fezzee.patterns.Observable;
 import com.fezzee.patterns.Observer;
-import com.fezzee.persistance.PseudoDB;
 import com.fezzee.service.XMPPService;
 import com.fezzee.service.connection.R;
-import com.fezzee.types.XMPPTypes;
 
 
 public class MainConnectionActivity extends Activity implements Observer{
@@ -104,7 +104,7 @@ public class MainConnectionActivity extends Activity implements Observer{
 	    	case R.id.action_chat:
 	    		
 	    		Intent i = new Intent(getBaseContext(),ChatHistoryActivity.class);
-	    		ChatHistoryActivity.setChatDatabase((PseudoDB)myService.getChatDatabase());
+	    		ChatHistoryActivity.setChatDatabase((ChatCollection)myService.getChatDatabase());
 	    		new Intent();
 	    		i.putExtra("JID", "gene");
 	    		startActivity(i);
@@ -133,8 +133,8 @@ public class MainConnectionActivity extends Activity implements Observer{
 				XMPPService.ConnectionBinder binder = (XMPPService.ConnectionBinder) service;        
 				   
 				setObservable(binder.getService());
-				myService.register(MainConnectionActivity.this, XMPPTypes.CONNECTION);
-				myService.setState("Service Started",XMPPTypes.CONNECTION);
+				myService.register(MainConnectionActivity.this, XMPPListenerTypes.CONNECTION);
+				myService.setState("Service Started",XMPPListenerTypes.CONNECTION);
 				isBound = true;    
 			}        
 		

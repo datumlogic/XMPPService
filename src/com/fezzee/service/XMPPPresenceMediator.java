@@ -1,7 +1,7 @@
 package com.fezzee.service;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
@@ -9,16 +9,20 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+
 import android.util.Log;
-import com.fezzee.persistance.FavoriteItem;
-import com.fezzee.types.XMPPTypes;
+
+import com.fezzee.data.ChatCollection;
+import com.fezzee.data.ChatCollection.ChatObject;
+import com.fezzee.data.ChatCollection.PresenceState;
+import com.fezzee.data.XMPPListenerTypes;
 import com.fezzee.service.connection.R;
 
 public class XMPPPresenceMediator {
 	
-	private static final String TAG = "PresenceMediator";
+	private static final String TAG = "XMPPPresenceMediator[Service]";
 	
-    protected static ArrayList<FavoriteItem> contacts = new ArrayList<FavoriteItem>();
+    protected static CopyOnWriteArrayList<ChatObject> contacts = new CopyOnWriteArrayList<ChatObject>();
     //protected Roster roster;
     
     private Collection<RosterEntry> entries;
@@ -61,10 +65,11 @@ public class XMPPPresenceMediator {
                 if (presence.getType().equals(Presence.Type.subscribe)) {
                 	Log.v(TAG + "::processPacket","SUBSCRIBE");
                 	
-                	FavoriteItem item = new FavoriteItem(presence.getFrom().split("/")[0],R.drawable.ic_launcher, presence.getFrom().split("@")[0], "SUBSCRIBE NOTIFICATION",FavoriteItem.PresenceState.NOTIFIED);
-		       	    contacts.add(item); 
+                
+                	Object item = new ChatObject(presence.getFrom(),R.drawable.ic_launcher, presence.getFrom().split("@")[0], "SUBSCRIBE NOTIFICATION",PresenceState.NOTIFIED);
+		       	    contacts.add((ChatObject)item); 
 		       	    
-		       	   service.setState(contacts, XMPPTypes.PERSISTANCE);
+		       	   service.setState(contacts, XMPPListenerTypes.PERSISTANCE);
 		       	    
                 } else if (presence.getType().equals(
                         Presence.Type.subscribed)) {

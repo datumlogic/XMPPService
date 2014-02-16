@@ -8,8 +8,8 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Message;
 
 import com.fezzee.activity.MainConnectionActivity;
-import com.fezzee.persistance.PseudoDB;
-import com.fezzee.types.XMPPTypes;
+import com.fezzee.data.ChatCollection;
+import com.fezzee.data.XMPPListenerTypes;
 
 import android.util.Log;
 
@@ -19,15 +19,15 @@ import android.util.Log;
 public class XMPPChatMediator {
 	
 	private ChatManager manager;
-	private final String TAG = "ChatMediator";
-	public PseudoDB msgDatabase;// = new PseudoDB();
+	private final String TAG = "XMPPChatMediator[Service]";
+	public ChatCollection msgDatabase;// = new PseudoDB();
 	private XMPPService service;
 
 	public XMPPChatMediator(ChatManager chatManager, XMPPService service){
 		//this.activeChats = new ArrayList<ChatManager>();
 		this.manager = chatManager;
 		this.service = service;
-		msgDatabase = new PseudoDB();
+		msgDatabase = new ChatCollection();
 		msgDatabase.setObservable(this.service);
 	}
 	
@@ -47,7 +47,7 @@ public class XMPPChatMediator {
 			String msg = message.getBody();
 			Log.d(TAG, "Xmpp message received: '" + msg + "' on thread: " + getThreadSignature());
 			if (msg != null)
-				service.setState(message,XMPPTypes.CHAT);
+				service.setState(message,XMPPListenerTypes.CHAT);
 			// --> this is another thread ('Smack Listener Processor') not the
 			// main thread!
 			// you can parse the content of the message here

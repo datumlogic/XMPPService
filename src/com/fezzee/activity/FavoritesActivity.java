@@ -1,6 +1,7 @@
 package com.fezzee.activity;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,20 +15,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.fezzee.data.ChatCollection;
+import com.fezzee.data.ChatCollection.ChatObject;
+import com.fezzee.data.XMPPListenerTypes;
 import com.fezzee.patterns.Observable;
 import com.fezzee.patterns.Observer;
-import com.fezzee.persistance.FavoriteItem;
-import com.fezzee.persistance.PseudoDB;
 import com.fezzee.service.connection.R;
-import com.fezzee.types.XMPPTypes;
-//import android.preference.PreferenceManager;
 
 
 public class FavoritesActivity extends Activity implements Observer {
 	
     private static final String TAG = "Favorites Activity";
     
-    private static ArrayList<FavoriteItem> contacts;
+    private static CopyOnWriteArrayList<ChatObject> contacts;
     //private Handler mHandler = new Handler();
     private ListView listview;
     private FavoritesListAdapter adapter;
@@ -42,7 +42,7 @@ public class FavoritesActivity extends Activity implements Observer {
 
 		setContentView(R.layout.activity_favorites);
 		
-		 contacts = new ArrayList<FavoriteItem>();
+		 contacts = new CopyOnWriteArrayList<ChatObject>();
 		
 		Log.d("FavoritesActivity","Entered...");
 		        
@@ -55,8 +55,8 @@ public class FavoritesActivity extends Activity implements Observer {
     			FavoritesActivity.contacts = MainConnectionActivity.myService.getContacts();
     			for (int i = 0; i < FavoritesActivity.contacts.size();i++)
     			{
-    				FavoriteItem item = FavoritesActivity.contacts.get(i);
-    				Log.e(TAG+"::update", "Item: " + item.getPresence());
+    				ChatObject item = FavoritesActivity.contacts.get(i);
+    				Log.v(TAG+"::update", "Item: " + item.getPresence());
     			
     			}
     		    setListAdapter();
@@ -69,7 +69,7 @@ public class FavoritesActivity extends Activity implements Observer {
 	
 	private void setListAdapter() 
 	{
-		Log.e(TAG+"::setListAdapter", "ENTERED");
+		Log.v(TAG+"::setListAdapter", "ENTERED");
         adapter = new FavoritesListAdapter(this,
                 R.layout.listitem_favs2, contacts);
         
@@ -81,9 +81,11 @@ public class FavoritesActivity extends Activity implements Observer {
 				     public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
 				                             long id) {
 				    	 
-				    	FavoriteItem fav = contacts.get(position);
+				    
+				    	ChatObject fav = contacts.get(position);
 				        Intent newActivity = new Intent(FavoritesActivity.this, ChatHistoryActivity.class); 
-				        ChatHistoryActivity.setChatDatabase((PseudoDB)MainConnectionActivity.myService.getChatDatabase());
+				        ChatCollection db = (ChatCollection)MainConnectionActivity.myService.getChatDatabase();
+				        ChatHistoryActivity.setChatDatabase(db.reorder(fav.getJID()));
 				        newActivity.putExtra("JID", fav.getJID());
 			            startActivity(newActivity);  
 				     }
@@ -120,7 +122,12 @@ public class FavoritesActivity extends Activity implements Observer {
 	@Override
 	public void setObservable(Observable obj)
 	{
-	    obj.register(this, XMPPTypes.PERSISTANCE);
+		//if (obj==null) 
+		//{
+		//	Log.e(TAG+"::setObservable","obj is NULL: " + obj);
+		//	return;
+		//}
+	    obj.register(this, XMPPListenerTypes.PERSISTANCE);
 	}
 
 	 /*
@@ -131,12 +138,13 @@ public class FavoritesActivity extends Activity implements Observer {
 	@Override
 	public void update(final Object msg) {
 		
-		FavoritesActivity.contacts = ((ArrayList<FavoriteItem>)msg);
+		FavoritesActivity.contacts = ((CopyOnWriteArrayList<ChatObject>)msg);
 		//for (int i = 0; i < FavoritesActivity.contacts.size();i++)
-		//     Log.e(TAG+"::update", "Item: " + FavoritesActivity.contacts.get(i).getPresence());
+		//     Log.v(TAG+"::update", "Item: " + FavoritesActivity.contacts.get(i).getPresence());
 
 		//XXX: MUST be done inside the handler or doesn't update
 		//TODO: Check to see if thats the issue with Chat as well!
+		//private Handler mHandler = new Handler();
 		mHandler.post(new Runnable() {
     		public void run() {
     			adapter.notifyDataSetChanged();
