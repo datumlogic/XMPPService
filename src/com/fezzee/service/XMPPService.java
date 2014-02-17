@@ -27,6 +27,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.fezzee.data.ChatCollection;
 import com.fezzee.data.ChatCollection.ChatObject;
 import com.fezzee.data.XMPPListenerTypes;
 import com.fezzee.patterns.Observable;
@@ -213,14 +214,14 @@ public class XMPPService extends Service implements Observable {
 	/*
 	 * Returns message Database
 	 */
-	public Object getChatDatabase() 
+	public ChatCollection getChatDatabase() 
 	{
 		if (chatMediator == null)
 		{
 			throw new IllegalStateException("ChatMediator is NULL");
 		
 		}
-		return chatMediator.msgDatabase;
+		return chatMediator.collChatObjects;
 	}
 
 	

@@ -20,15 +20,15 @@ public class XMPPChatMediator {
 	
 	private ChatManager manager;
 	private final String TAG = "XMPPChatMediator[Service]";
-	public ChatCollection msgDatabase;// = new PseudoDB();
+	public ChatCollection collChatObjects;// = new PseudoDB();
 	private XMPPService service;
 
 	public XMPPChatMediator(ChatManager chatManager, XMPPService service){
 		//this.activeChats = new ArrayList<ChatManager>();
 		this.manager = chatManager;
 		this.service = service;
-		msgDatabase = new ChatCollection();
-		msgDatabase.setObservable(this.service);
+		collChatObjects = ChatCollection.getInstance();
+		collChatObjects.setObservable(this.service);
 	}
 	
 	public void registerChat(String jid) {

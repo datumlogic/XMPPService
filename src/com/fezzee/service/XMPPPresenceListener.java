@@ -10,8 +10,9 @@ import org.jivesoftware.smack.packet.Presence;
 
 import android.util.Log;
 
-import com.fezzee.data.ChatCollection.ChatObject;
-import com.fezzee.data.ChatCollection.PresenceState;
+import com.fezzee.data.ChatCollection;
+//import com.fezzee.data.ChatCollection.ChatObject;
+//import com.fezzee.data.ChatCollection.PresenceState;
 import com.fezzee.data.XMPPListenerTypes;
 import com.fezzee.service.connection.R;
 
@@ -39,7 +40,7 @@ public class XMPPPresenceListener implements RosterListener {
             //if we find any existing jid's in the param collection, remove it from the param colection
     		for (int i = 0; i < XMPPPresenceMediator.contacts.size(); i++)
             {
-            	ChatObject fav= XMPPPresenceMediator.contacts.get(i);
+    			ChatCollection.ChatObject fav= XMPPPresenceMediator.contacts.get(i);
             	if ( param.contains(fav.getJID()))
             	{
             		Log.v(TAG + "::entriesAdded",  "User Found, so removing it");
@@ -47,9 +48,10 @@ public class XMPPPresenceListener implements RosterListener {
             	}
             }
     		//now add any remaining JIDs to contacts.
-    		for (Iterator<String> Params = param.iterator(); Params.hasNext();) {
-    			
-    			ChatObject item = new ChatObject(Params.next(),R.drawable.ic_launcher,"","",PresenceState.UNAVILABLE);
+    		for (Iterator<String> Params = param.iterator(); Params.hasNext();) 
+    		{
+    			//I was never aware of this x.new() syntax before!
+    			ChatCollection.ChatObject item = ChatCollection.getInstance().new ChatObject(Params.next(),R.drawable.ic_launcher,"","",ChatCollection.PresenceState.UNAVILABLE);
     			Log.v(TAG + "::entriesAdded",  "ADDING: " + item.getJID());
     			XMPPPresenceMediator.contacts.add(item);
     		}
@@ -64,7 +66,7 @@ public class XMPPPresenceListener implements RosterListener {
     	
     	for (int i = 0; i < XMPPPresenceMediator.contacts.size(); i++)
         {
-        	ChatObject fav= XMPPPresenceMediator.contacts.get(i);
+    		ChatCollection.ChatObject fav= XMPPPresenceMediator.contacts.get(i);
         	Log.v(TAG + "::entriesDeleted",  "Fav item: " + i + " : " + fav);
         	if ( addresses.contains(fav.getJID()))
         	{
@@ -93,11 +95,11 @@ public class XMPPPresenceListener implements RosterListener {
     	//for now lets just reset it to unavailable and clear the status
 		for (int i = 0; i < XMPPPresenceMediator.contacts.size(); i++)
         {
-        	ChatObject fav = XMPPPresenceMediator.contacts.get(i);
+			ChatCollection.ChatObject fav = XMPPPresenceMediator.contacts.get(i);
         	if (addresses.contains(fav.getJID()))
         	{
         		Log.v(TAG + "::entriesUpdated",  "Resetting...");
-        		fav.setPresence(PresenceState.UNAVILABLE);
+        		fav.setPresence(ChatCollection.PresenceState.UNAVILABLE);
         		fav.setStatus("");
         	}
         }
@@ -121,13 +123,13 @@ public class XMPPPresenceListener implements RosterListener {
     	//find the associated FavoriteItem and update the presence and status
     	for (int i = 0; i < XMPPPresenceMediator.contacts.size(); i++)
         {
-        	ChatObject fav= XMPPPresenceMediator.contacts.get(i);
+    		ChatCollection.ChatObject fav= XMPPPresenceMediator.contacts.get(i);
         	if (fav.getJID() == entry.getUser())
         	{
         		Log.v(TAG + "::presenceChanged",  "UserFound");
         		
                 String jid = entry.getUser();
-        		fav.setPresence((presence.getType() == Presence.Type.available)?PresenceState.AVAILABLE:PresenceState.UNAVILABLE);
+        		fav.setPresence((presence.getType() == Presence.Type.available)?ChatCollection.PresenceState.AVAILABLE:ChatCollection.PresenceState.UNAVILABLE);
         		fav.setStatus(presence.getStatus());
         		fav.setName(entry.getUser().split("@")[0]);
         		break;

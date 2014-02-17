@@ -13,8 +13,8 @@ import org.jivesoftware.smack.packet.Presence;
 import android.util.Log;
 
 import com.fezzee.data.ChatCollection;
-import com.fezzee.data.ChatCollection.ChatObject;
-import com.fezzee.data.ChatCollection.PresenceState;
+//import com.fezzee.data.ChatCollection.ChatObject;
+//import com.fezzee.data.ChatCollection.PresenceState;
 import com.fezzee.data.XMPPListenerTypes;
 import com.fezzee.service.connection.R;
 
@@ -22,7 +22,7 @@ public class XMPPPresenceMediator {
 	
 	private static final String TAG = "XMPPPresenceMediator[Service]";
 	
-    protected static CopyOnWriteArrayList<ChatObject> contacts = new CopyOnWriteArrayList<ChatObject>();
+    protected static CopyOnWriteArrayList<ChatCollection.ChatObject> contacts = new CopyOnWriteArrayList<ChatCollection.ChatObject>();
     //protected Roster roster;
     
     private Collection<RosterEntry> entries;
@@ -66,8 +66,8 @@ public class XMPPPresenceMediator {
                 	Log.v(TAG + "::processPacket","SUBSCRIBE");
                 	
                 
-                	Object item = new ChatObject(presence.getFrom(),R.drawable.ic_launcher, presence.getFrom().split("@")[0], "SUBSCRIBE NOTIFICATION",PresenceState.NOTIFIED);
-		       	    contacts.add((ChatObject)item); 
+                	ChatCollection.ChatObject item = ChatCollection.getInstance().new  ChatObject(presence.getFrom(),R.drawable.ic_launcher, presence.getFrom().split("@")[0], "SUBSCRIBE NOTIFICATION", ChatCollection.PresenceState.NOTIFIED);
+		       	    //contacts.add(item); 
 		       	    
 		       	   service.setState(contacts, XMPPListenerTypes.PERSISTANCE);
 		       	    

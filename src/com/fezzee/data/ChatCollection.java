@@ -30,8 +30,10 @@ public class ChatCollection implements Observer {
 	//public HashMap<ChatPerson,ArrayList<String>> msgDatabase; //FIXME: SHOULDN NOT BE PUBLIC
 
 	//NEW Treadsafe Collection
-	private CopyOnWriteArrayList<ChatObject> collChatThreadSafe;
+	private CopyOnWriteArrayList<ChatObject> collChatThreadSafe = new CopyOnWriteArrayList<ChatObject>();
+	private static final ChatCollection INSTANCE = new ChatCollection();
 	
+	/*
 	public ChatCollection()
 	{
 		    //DEPRECATED- REPLACING
@@ -50,6 +52,20 @@ public class ChatCollection implements Observer {
 		   this.setMsg("gene@ec2-54-201-47-27.us-west-2.compute.amazonaws.com", "hello world");
 		     
 	}
+	*/
+	
+	
+
+	   // Private constructor prevents instantiation from other classes
+	   private ChatCollection() 
+	   {
+		   //XXX for testing only
+		   this.setMsg("gene@ec2-54-201-47-27.us-west-2.compute.amazonaws.com", "hello world");
+	   }
+
+	   public static ChatCollection getInstance() {
+	      return INSTANCE;
+	   }
 	
 	/*
 	 * DEPRECATED
