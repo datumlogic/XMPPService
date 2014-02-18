@@ -38,7 +38,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
     private AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     private ViewPager mViewPager;
     
-    
+    protected  ActionBar actionBar;//  = getActionBar();
     
     private static Bundle passedArgs;
     
@@ -75,7 +75,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the action bar.
-        final ActionBar actionBar = getActionBar();
+        actionBar  = getActionBar();
         
         Log.d(TAG,"Actionbar: " + actionBar);
 
@@ -203,19 +203,59 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
     		Log.v(TAG,"update() JID: '" + host + "'");
 
     	    
-    	    int pos = Arrays.asList(pseudoDB.getNames()).indexOf(host);
+    	    final int pos = Arrays.asList(pseudoDB.getNames()).indexOf(host);
        	    if (pos == -1) 
        	    {
        		   Log.e(TAG,"update() JID not found, can not update: '" + host+ "'");
        		   return; 
        	    }
        	    
+       	    Log.e(TAG+"::update() >>>>>>>>>>>","SIZE: "+ChatHistoryActivity.pseudoDB.size() + " POS: " + pos + " CHAT FRAGS: " + ChatFragment.mFragments.size());
+       	    
+       	    if (ChatHistoryActivity.pseudoDB.size() > ChatFragment.mFragments.size())
+       	    {
+       	    	//ChatFragment frag = ChatFragment.init(pseudoDB.getJIDs()[pos],pseudoDB.getNames()[pos],pseudoDB.getMsgs(pseudoDB.getJIDs()[pos]));
+       	    	/*
+       	    	actionBar.addTab(
+                        actionBar.newTab()
+                                .setText(mAppSectionsPagerAdapter.getPageTitle(pos))
+                                .setIcon(R.drawable.chaticon)
+                                .setTabListener(ChatHistoryActivity.this));
+                
+       	    	/*
+       	    	notifyDataSetChanged();
+       	    	Log.e("TEST","%%%%%%%% ");
+       	    	*/
+       	    	//Log.e("TEST","%%%%%%%% " + pseudoDB.getMsgs(pseudoDB.getJIDs()[pos]));
+       	    	//ChatFragment.init(pseudoDB.getJIDs()[pos],pseudoDB.getNames()[pos],pseudoDB.getMsgs(pseudoDB.getJIDs()[pos]));
+       	    	//Log.e("TEST","%%%%%%%% ");
+       	    	//notifyDataSetChanged();
+       	    	//Log.e("TEST","%%%%%%%% " + mAppSectionsPagerAdapter.getPageTitle(pos));
+       	    	
+       	    	
+       	    	mHandler.post(new Runnable() {
+    	    		public void run() {
+    	    			actionBar.addTab(
+    	                        actionBar.newTab()
+    	                                .setText(mAppSectionsPagerAdapter.getPageTitle(pos))
+    	                                .setIcon(R.drawable.chaticon)
+    	                                .setTabListener(ChatHistoryActivity.this));
+    	    			Log.e(TAG+"::run()","run()");
+    	    			AppSectionsPagerAdapter.this.notifyDataSetChanged();
+    	    		}
+    	    	});
+    	    	
+       	    }
+       	    
+       	    /*
        	    mHandler.post(new Runnable() {
 	    		public void run() {
+	    			Log.e(TAG+"::run()","run()");
 	    			AppSectionsPagerAdapter.this.notifyDataSetChanged();
 	    		}
 	    	});
-
+            */
+       	    
    		    ChatFragment frag = (ChatFragment)this.instantiateItem( ChatHistoryActivity.this.mViewPager, pos );
    		    //msgDatabase.setMessage(host, body);
    		   

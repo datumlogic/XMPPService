@@ -37,12 +37,12 @@ public class ChatFragment extends ListFragment {
     protected ListView listView;
     
     
-    private static HashMap<String,ChatFragment> mFragments = new HashMap<String,ChatFragment>();
+    protected static HashMap<String,ChatFragment> mFragments = new HashMap<String,ChatFragment>();
     
     public CopyOnWriteArrayList<ChatCollection.ChatMessage> messages;
 
     static ChatFragment init(String jidHost, String name, CopyOnWriteArrayList<ChatCollection.ChatMessage> msgs) {
-    	
+    	Log.v(TAG+"::init()","ENTERED");
     	ChatFragment chatList;
     	if (mFragments.containsKey(jidHost))
     	{
@@ -51,6 +51,7 @@ public class ChatFragment extends ListFragment {
     	}
     	else
     	{
+    		Log.v(TAG+"::init()","creating");
     		chatList = new ChatFragment();
     		chatList.messages = (CopyOnWriteArrayList<ChatCollection.ChatMessage>)msgs;
     		mFragments.put(jidHost, chatList);
