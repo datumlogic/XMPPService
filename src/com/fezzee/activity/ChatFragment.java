@@ -1,6 +1,5 @@
 package com.fezzee.activity;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,8 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.fezzee.data.ChatCollection;
@@ -34,6 +33,8 @@ public class ChatFragment extends ListFragment {
     View rootView;
     
     ListAdapter listAdapter;
+    
+    protected ListView listView;
     
     
     private static HashMap<String,ChatFragment> mFragments = new HashMap<String,ChatFragment>();
@@ -83,6 +84,8 @@ public class ChatFragment extends ListFragment {
         
         //Log.d(TAG,"Chat Index: " + args.getInt(ARG_SECTION_NUMBER));
         Log.v(TAG,"onCreateView(): " + args.getString("jid"));
+        
+        listView = (ListView) rootView.findViewById(android.R.id.list);
        
        //This is the Bottom Bar in the Chat window- that has the name of the person you're chatting to. 
         ((TextView) rootView.findViewById(R.id.text)).setText(
@@ -95,8 +98,13 @@ public class ChatFragment extends ListFragment {
         	Log.e(TAG+"::onCreateView", "CRASH AVOIDED: Messages are null: Created empty messages arraylist");
         }
         
-        listAdapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, this.messages);
+        listAdapter = new ChatListAdapter(this.getActivity(),
+        		android.R.layout.simple_list_item_1, this.messages);
+        
+		//ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.listitem_favorites, contacts);
+        //Log.e(TAG+"::onCreateView","listView/listAdapter: "+listView+" : " + listAdapter);
+        
+		listView.setAdapter(listAdapter);
         /*
         ListView lv = ((ListView) rootView.findViewById(android.R.id.list));
         if (listAdapter != null)

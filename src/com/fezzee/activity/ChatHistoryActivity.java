@@ -160,6 +160,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         public Fragment getItem(int position) {
         	
         	   //containsJID returns the messages if the JID exists
+        	    String[] names = pseudoDB.getNames();
         	    Log.d(TAG,"getItem() called: " + position + " : " + pseudoDB.getNames()[position] + " : " + pseudoDB.getMsgs(pseudoDB.getNames()[position]));
             	//return ChatFragment.init(pseudoDB.getNames()[position],pseudoDB.ifContainsJidReturnMsgs(pseudoDB.getNames()[position]));
         	    return ChatFragment.init(pseudoDB.getJIDs()[position],pseudoDB.getNames()[position],pseudoDB.getMsgs(pseudoDB.getJIDs()[position]));
@@ -168,6 +169,7 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
         @Override
         public CharSequence getPageTitle(int position) {
             //
+        	Log.d(TAG+"::getPageTitle", "###### POS ###### " + position);
             return pseudoDB.getNames()[position];
         }
         
@@ -207,9 +209,16 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
        		   Log.e(TAG,"update() JID not found, can not update: '" + host+ "'");
        		   return; 
        	    }
+       	    
+       	    mHandler.post(new Runnable() {
+	    		public void run() {
+	    			AppSectionsPagerAdapter.this.notifyDataSetChanged();
+	    		}
+	    	});
 
    		    ChatFragment frag = (ChatFragment)this.instantiateItem( ChatHistoryActivity.this.mViewPager, pos );
    		    //msgDatabase.setMessage(host, body);
+   		   
   		   
    		    if (mViewPager.getCurrentItem() == pos || mViewPager.getCurrentItem() == pos-1 || mViewPager.getCurrentItem() == pos+1)
    		    {
@@ -218,22 +227,36 @@ public class ChatHistoryActivity extends FragmentActivity implements ActionBar.T
    			    //just detaching and reattaching the fragment.
    			    //if you're not on the fragment thats being updated, this not required
    			    //but if its called when the page isn't the current  view (+/- 1 on either side) it causes a crash
+   		         
+   		         
    			    FragmentManager fragmentManager = getSupportFragmentManager();
    			    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
    			    fragmentTransaction.detach(frag);
    			    fragmentTransaction.attach(frag);
    			    fragmentTransaction.commit();
+   			    
+   		         
+   		        mHandler.post(new Runnable() {
+     	    		public void run() {
+     	    			AppSectionsPagerAdapter.this.notifyDataSetChanged();
+     	    		}
+     	    	}); 
+   		         
+   		        return;
+   		        
    		     } 
    		    
-   		/*
-   		//private Handler mHandler = new Handler();
+   		 Log.v(TAG,"Current page visible >>>>>>>> " + pos + " -- current item: " + mViewPager.getCurrentItem());
+   		    
+   		    /*
+   		    //private Handler mHandler = new Handler();
    			mHandler.post(new Runnable() {
    	    		public void run() {
    	    			AppSectionsPagerAdapter.this.notifyDataSetChanged();
    	    		}
    	    	});
-   	    	
-   	    */
+   	    	*/
+   	    
     	} // end of update()
     }// end of inner class AppSectionsPagerAdapter
 }// end of class ChatHistoryAdapter

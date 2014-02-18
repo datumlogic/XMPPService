@@ -491,6 +491,7 @@ public class XMPPService extends Service implements Observable {
 				int j = 0;
 				for (Observer obj : observersLocal) {
 					Log.d(TAG,"CHAT notified: " + ((org.jivesoftware.smack.packet.Message)msg).getFrom() + " : " + ((org.jivesoftware.smack.packet.Message)msg).getBody()  );
+					Log.e(TAG,"CHAT notified CLASS: " +obj.getClass());
 					obj.update(msg);
 					j++;
 				}

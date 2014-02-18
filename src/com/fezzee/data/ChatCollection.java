@@ -2,14 +2,13 @@ package com.fezzee.data;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import android.util.Log;
 
 import com.fezzee.patterns.Observable;
 import com.fezzee.patterns.Observer;
-import com.fezzee.utils.DateTime;
 
 
 /*
@@ -32,6 +31,8 @@ public class ChatCollection implements Observer {
 	//NEW Treadsafe Collection
 	private CopyOnWriteArrayList<ChatObject> collChatThreadSafe = new CopyOnWriteArrayList<ChatObject>();
 	private static final ChatCollection INSTANCE = new ChatCollection();
+	
+	private static final String TAG = "ChatCollection";
 	
 	/*
 	public ChatCollection()
@@ -401,10 +402,20 @@ public class ChatCollection implements Observer {
 	
 	public void update(final Object msg) {
 		
-		String jid = ((org.jivesoftware.smack.packet.Message)msg).getFrom();
-		String host = jid.substring(0, jid.indexOf('@'));
+		//NOTE- getFrom() has the device appended- Need to strip it!
+		String jid = ((org.jivesoftware.smack.packet.Message)msg).getFrom().split("/")[0];
 		String body = ((org.jivesoftware.smack.packet.Message)msg).getBody();
-
+		
+		Iterator<ChatObject> chats = this.collChatThreadSafe.iterator();
+		while(chats.hasNext()) {
+			ChatObject chat = chats.next();
+			Log.d(TAG+"::update**********","[chat.getJID]: " + chat.getJID() + "  [msg.getFrom()]: " + jid);
+			if (chat.getJID().equals(jid)) {
+				chat.setMessage(body);
+				return;
+			}
+		}
+		//if not found add it to the end
 		this.setMsg(jid,body);
         
 	}
@@ -537,6 +548,11 @@ public class ChatCollection implements Observer {
 			this.id = id;
 			this.timestamp = timestamp; 
 			
+		}
+		
+		public String getMessage()
+		{
+			return this.body;
 		}
 		
 	}
